@@ -5,12 +5,17 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
 typedef struct sllist_s {
     struct sllist_s *nxt;
 } sl_list_t;
 
 #define SL_LIST_HD(hdr)                                                       \
   sl_list_t  hdr = { .nxt = NULL }
+
+#define SL_LIST_ENTRY(ptr, type, member)                                      \
+  (type*)((char*)ptr - offsetof(type, member))
 
 
 static inline void sllist__insert(sl_list_t *nd, sl_list_t *prv, sl_list_t *nxt)

@@ -13,10 +13,11 @@ int main()
     SL_LIST_HD(hdr);
 
     test_list first = { .value = 10, .nd = { .nxt = NULL }};
+    test_list second = { .value = 20, .nd = { .nxt = NULL }};
 
     insert(&(first.nd), &hdr);
+    insert(&(second.nd), &hdr);
 
-
-
-    std::cout << "list header created" << std::endl;
+    test_list *nd = SL_LIST_ENTRY(hdr.nxt, test_list, nd);
+    std::cout << "list value = " << nd->value << std::endl;
 }
