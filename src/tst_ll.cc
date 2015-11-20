@@ -1,5 +1,6 @@
 #include "llist.h"
 #include <iostream>
+#include <cassert>
 
 typedef struct my_list {
     int value;
@@ -15,9 +16,14 @@ int main()
     test_list first = { .value = 10, .nd = { .nxt = NULL }};
     test_list second = { .value = 20, .nd = { .nxt = NULL }};
 
-    insert(&(first.nd), &hdr);
-    insert(&(second.nd), &hdr);
+    sllist_insert(&(first.nd), 1, &hdr);
+    sllist_insert(&(second.nd), 1,  &hdr);
 
-    test_list *nd = SL_LIST_ENTRY(hdr.nxt, test_list, nd);
-    std::cout << "list value = " << nd->value << std::endl;
+
+    for( sl_list_t *n = hdr.nxt; n; n = n->nxt) {
+        test_list *nd = SL_LIST_ENTRY(n, test_list, nd);
+        std::cout << nd->value << std::endl;
+    }
+
+    assert( 2 == sllist_len(hdr.nxt));
 }
