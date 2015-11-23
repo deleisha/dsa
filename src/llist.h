@@ -20,40 +20,42 @@ typedef struct sllist_s {
 #define SL_FOR_EACH(pos, list)      \
   for( (pos) = list; (pos); (pos) = (pos)->nxt)
 
-
 static inline void sllist__insert(sl_list_t *nd, sl_list_t *prv, sl_list_t *nxt)
 {
     prv->nxt = nd;
     nd->nxt = nxt;
 }
 
-static inline void sllist_insert( sl_list_t *node, int pos, sl_list_t *list)
+static inline void insert( sl_list_t *node, sl_list_t *list)
 {
-    sl_list_t *prev = NULL;
-    sl_list_t *nxt = NULL;
-    sl_list_t *itr = NULL;
-    int i = 1;
-    
     if (!list) return;
-    if ( pos == 1) {
-        prev = list;
-        nxt = list->nxt;
-    }
-    else {
-        for( itr = list; (itr && i < pos); itr = itr->nxt) {
-            ++i;
-        }
-        prev = itr;
-        nxt = itr->nxt;
-    }
-    sllist__insert( node, prev, nxt);
+    sllist__insert( node, list, list->nxt);
 }
 
-static inline void sllist_del_node(sl_list_t *node, int pos, sl_list_t *list)
+static inline void append(sl_list_t *node, sl_list_t *list)
 {
+    sl_list_t *prv = NULL;
+    sl_list_t *t = NULL;
+    SL_FOR_EACH (t, list) {
+        prv = t;
+    }
+    sllist__insert(node, prv, prv->nxt);
 }
 
-int sllist_len(sl_list_t *list)
+static inline void delete_nd(sl_list_t *node, sl_list_t *list)
+{
+    sl_list_t *t = NULL;
+    if ( !(node && list) ) return;
+
+    SL_FOR_EACH(t, list) {
+        if ( (t && t->nxt) && (t->nxt == node) ) {
+            break;
+        }
+    }
+    t->nxt = node->nxt;
+}
+
+static int sllist_len(sl_list_t *list)
 {
     int count = 0;
     sl_list_t *tmp;
@@ -65,7 +67,6 @@ int sllist_len(sl_list_t *list)
     }
     return count;
 }
-//static inline void remove(
 
 #ifdef __cplusplus
 }
