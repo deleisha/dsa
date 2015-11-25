@@ -42,6 +42,7 @@ static inline void append(sl_list_t *node, sl_list_t *list)
     sllist__insert(node, prv, prv->nxt);
 }
 
+//expect the node to be in the list
 static inline void delete_nd(sl_list_t *node, sl_list_t *list)
 {
     sl_list_t *t = NULL;
