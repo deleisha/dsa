@@ -47,12 +47,13 @@ my_list* nth_from_end(sl_list_t *list, const int n)
 
 bool is_circular(sl_list_t *list)
 {
-    sl_list_t *slow_ptr = NULL;
-    sl_list_t *fast_ptr = NULL;
-    for(slow_ptr = list, fast_ptr = list; slow_ptr && fast_ptr && fast_ptr->nxt;
-           slow_ptr = slow_ptr->nxt, fast_ptr = fast_ptr->nxt)
+    sl_list_t *slow_ptr = list;
+    sl_list_t *fast_ptr = list;
+    for(; slow_ptr && fast_ptr && fast_ptr->nxt && fast_ptr->nxt->nxt;
+           )
     {
-        fast_ptr = fast_ptr->nxt;
+        slow_ptr = slow_ptr->nxt;
+        fast_ptr = fast_ptr->nxt->nxt;
         if ( slow_ptr == fast_ptr ) return true;
     }
     return false;
@@ -60,22 +61,23 @@ bool is_circular(sl_list_t *list)
 
 sl_list_t* find_loop_start(sl_list_t *list)
 {
-    sl_list_t *slow_ptr = NULL;
-    sl_list_t *fast_ptr = NULL;
+    sl_list_t *slow_ptr = list;
+    sl_list_t *fast_ptr = list;
     bool is_circular = false;
-    for(slow_ptr = list, fast_ptr = list; slow_ptr && fast_ptr && fast_ptr->nxt;
-           fast_ptr = fast_ptr->nxt, slow_ptr = slow_ptr->nxt)
+
+    for(; slow_ptr && fast_ptr && fast_ptr->nxt && fast_ptr->nxt->nxt;)
     {
-        fast_ptr = fast_ptr->nxt;
+        slow_ptr = slow_ptr->nxt;
+        fast_ptr = fast_ptr->nxt->nxt;
         if ( slow_ptr == fast_ptr ) {
             is_circular = true;
             break;
         }
     }
+
     if (is_circular) {
-        for( fast_ptr = list; slow_ptr != fast_ptr; slow_ptr = slow_ptr->nxt) {
-     //       std::cout << (SL_LIST_ENTRY(slow_ptr, my_list, nd))->value << "\t" << (SL_LIST_ENTRY(fast_ptr, my_list, nd))->value << std::endl;
-            fast_ptr = fast_ptr->nxt;
+        for( fast_ptr = list; slow_ptr != fast_ptr; slow_ptr = slow_ptr->nxt, fast_ptr = fast_ptr->nxt) {
+            ;
         }
 
         return slow_ptr;
@@ -84,13 +86,14 @@ sl_list_t* find_loop_start(sl_list_t *list)
 }
 int find_loop_len(sl_list_t *list)
 {
-    sl_list_t *slow_ptr = NULL;
-    sl_list_t *fast_ptr = NULL;
+    sl_list_t *slow_ptr = list;
+    sl_list_t *fast_ptr = list;
     bool is_circular = false;
-    for(slow_ptr = list, fast_ptr = list; slow_ptr && fast_ptr && fast_ptr->nxt;
-           slow_ptr = slow_ptr->nxt, fast_ptr = fast_ptr->nxt)
+
+    for(; slow_ptr && fast_ptr && fast_ptr->nxt && fast_ptr->nxt->nxt;)
     {
-        fast_ptr = fast_ptr->nxt;
+        slow_ptr = slow_ptr->nxt;
+        fast_ptr = fast_ptr->nxt->nxt;
         if ( slow_ptr == fast_ptr ) {
             is_circular = true;
             break;
@@ -119,7 +122,7 @@ void test_nth_from_end(sl_list_t hdr)
     assert( t == NULL);
 }
 
-#define ENABLE_DEBG 1
+#define ENABLE_DEBG 0
 int main(int argc, char *argv[])
 {
     SL_LIST_HD(hdr);
@@ -134,19 +137,12 @@ int main(int argc, char *argv[])
         std::cout << p->value << std::endl;
     }
 #endif
-//    test_nth_from_end( hdr);
+    test_nth_from_end( hdr);
 
     //test floyd algo
     nodes[9].nd.nxt = nodes[4].nd.nxt;
 
     assert(is_circular(hdr.nxt));
-//    std::cout << (SL_LIST_ENTRY(find_loop_start(hdr.nxt), my_list, nd))->value << std::endl;
-#if ENABLE_DEBG
-    SL_FOR_EACH(ptr, hdr.nxt) {
-        my_list  *p = SL_LIST_ENTRY(ptr, my_list, nd);
-        std::cout << p->value << std::endl;
-    }
-#endif
 
     nodes[9].nd.nxt = NULL;
     assert(!is_circular(hdr.nxt));
