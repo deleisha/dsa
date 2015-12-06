@@ -76,14 +76,17 @@ sl_list_t* find_loop_start(sl_list_t *list)
     }
 
     if (is_circular) {
-        for( fast_ptr = list; slow_ptr != fast_ptr; slow_ptr = slow_ptr->nxt, fast_ptr = fast_ptr->nxt) {
-            ;
+        for( fast_ptr = list; slow_ptr != fast_ptr; ) {
+            slow_ptr = slow_ptr->nxt;
+            fast_ptr = fast_ptr->nxt;
         }
 
         return slow_ptr;
     }
     return NULL;
 }
+
+
 int find_loop_len(sl_list_t *list)
 {
     sl_list_t *slow_ptr = list;
@@ -101,10 +104,11 @@ int find_loop_len(sl_list_t *list)
     }
     int cnt = 0;
     if (is_circular) {
-        for( ;slow_ptr != fast_ptr; fast_ptr = fast_ptr->nxt)
-        {
+        assert( slow_ptr == fast_ptr);
+        do {
+            fast_ptr = fast_ptr->nxt;
             ++cnt;
-        }
+        } while( slow_ptr != fast_ptr);
     }
     return cnt;
 }
@@ -143,9 +147,16 @@ int main(int argc, char *argv[])
     nodes[9].nd.nxt = nodes[4].nd.nxt;
 
     assert(is_circular(hdr.nxt));
+    sl_list_t *rptr = find_loop_start(hdr.nxt);
+    std::cout <<  (SL_LIST_ENTRY(rptr, my_list, nd))->value << std::endl;
+    std::cout << find_loop_len(hdr.nxt) << std::endl;
 
     nodes[9].nd.nxt = NULL;
     assert(!is_circular(hdr.nxt));
-    nodes[9].nd.nxt = nodes[0].nd.nxt;
+    assert( 0 == find_loop_len(hdr.nxt));
+    nodes[9].nd.nxt = nodes[2].nd.nxt;
     assert(is_circular(hdr.nxt));
+    rptr = find_loop_start(hdr.nxt);
+    std::cout <<  (SL_LIST_ENTRY(rptr, my_list, nd))->value << std::endl;
+    std::cout << find_loop_len(hdr.nxt) << std::endl;
 }
